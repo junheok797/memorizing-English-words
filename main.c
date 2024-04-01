@@ -3,6 +3,9 @@
 #include <string.h>
 #include <time.h>
 
+// 행맨게임 구현
+// 한글 깨짐
+
 typedef struct Word {
     char* english;
     char* korean;
@@ -64,7 +67,26 @@ void freeWords(Word* words, int size) {
     free(words);
 }
 
-int main(){
+void answer(char* word, int* length) {
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < length - 1; j++) {
+            printf("_");
+        }
+    }
+}
+
+void game(Word* words, int size) {
+    srand(time(NULL));
+    int i = rand() % size;
+
+    int length = strlen(words[i].english);
+    char word = malloc(length + 1);
+    strcpy(words[i].english, word);
+
+    answer(word, length);
+}
+
+int main() {
     const char* filename = "word.txt";
     
     int size;
