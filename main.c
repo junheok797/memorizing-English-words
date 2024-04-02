@@ -67,12 +67,38 @@ void freeWords(Word* words, int size) {
     free(words);
 }
 
-void answer(char* word, int* length) {
+void check(char* word, char* answer, int* length, int* stage) {
+    if (stage == 1) {
+
+    }
+    else {
+
+    }
+}
+
+void stage2(char* word, int* length) {
+    char* answer = malloc(length + 1);
+
     for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < length - 1; j++) {
+        for (int j = 0; j < length; j++) {
             printf("_");
         }
+        scanf("%c", &answer);
+        //check(word, answer, length, stage);
     }
+
+
+}
+
+void stage1(char* word, int* length) {
+    char answer[1];
+    int stage = 1;
+
+    for (int i = 0; i < length; i++) {
+        printf("_");
+    }
+    scanf("%c", &answer);
+    check(word, answer, length, stage);
 }
 
 void game(Word* words, int size) {
@@ -80,16 +106,19 @@ void game(Word* words, int size) {
     int i = rand() % size;
 
     int length = strlen(words[i].english);
-    char word = malloc(length + 1);
-    strcpy(words[i].english, word);
+    char* word = malloc(length + 1);
+    strcpy(word, words[i].english);
 
-    answer(word, length);
+    stage1(word, length);
+    stage2(word, length);
+
+    free(word);
 }
 
 int main() {
-    const char* filename = "word.txt";
-    
+    int life;
     int size;
+    const char* filename = "word.txt";
 
     Word* words = getWord(filename, &size);
     if (words == NULL) {
