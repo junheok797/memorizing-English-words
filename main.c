@@ -3,8 +3,8 @@
 #include <string.h>
 #include <time.h>
 
-// í–‰ë§¨ê²Œìž„ êµ¬í˜„
-// í•œê¸€ ê¹¨ì§
+// ?–‰ë§¨ê²Œ?ž„ êµ¬í˜„
+// ?•œê¸? ê¹¨ì§
 
 typedef struct Word {
     char* english;
@@ -12,13 +12,13 @@ typedef struct Word {
 } Word;
 
 Word* getWord(const char* filename, int* size){
-    // íŒŒì¼ ì—´ê¸°
+    // ?ŒŒ?¼ ?—´ê¸?
     FILE *in = fopen("word.txt", "r");
     if (in == NULL) {
-        printf("íŒŒì¼ ì—´ê¸° ì‹¤íŒ¨: %s\n", filename);
+        printf("?ŒŒ?¼ ?—´ê¸? ?‹¤?Œ¨: %s\n", filename);
     }
 
-    // ë‹¨ì–´ ê°œìˆ˜ ì„¸ê¸°
+    // ?‹¨?–´ ê°œìˆ˜ ?„¸ê¸?
     *size = 0;
     char line[50];
     while (fgets(line, sizeof(line), in)) {
@@ -26,15 +26,15 @@ Word* getWord(const char* filename, int* size){
     }
     rewind(in);
 
-    // ë™ì  í• ë‹¹
+    // ?™?  ?• ?‹¹
     Word* words = malloc(sizeof(Word) * (*size));
     if (words == NULL) {
-        printf("ë™ì  ë©”ëª¨ë¦¬ í• ë‹¹ ì˜¤ë¥˜\n");
+        printf("?™?  ë©”ëª¨ë¦? ?• ?‹¹ ?˜¤ë¥?\n");
         fclose(in);
         exit(1);
     }
 
-    // íŒŒì¼ ë‚´ìš© ì½ì–´ì„œ ë°°ì—´ì— ì €ìž¥
+    // ?ŒŒ?¼ ?‚´?š© ?½?–´?„œ ë°°ì—´?— ????ž¥
     int i = 0;
     while (fgets(line, sizeof(line), in)) {
         char* english = strtok(line, " ");
@@ -67,9 +67,17 @@ void freeWords(Word* words, int size) {
     free(words);
 }
 
-void check(char* word, char* answer, int* length, int* stage) {
+void check(char* word, int* correct, int length, int stage) {
+    char* answer = malloc(length);
     if (stage == 1) {
+        printf("¿øÇÏ´Â ¾ËÆÄºªÀ» ÀÔ·ÂÇÏ¼¼¿ä>> ");
+        scanf("%s", &answer);
 
+        for (int i = 0; i < length; i++) {
+            if (word[i] == answer[0]) {
+                correct[i] = 1;
+            }
+        }
     }
     else {
 
@@ -90,18 +98,31 @@ void stage2(char* word, int* length) {
 
 }
 
-void stage1(char* word, int* length) {
-    char answer[1];
+void stage1(char* word, int length, int* life) {
+    int* correct = (int*)malloc(sizeof(int) * length);
     int stage = 1;
 
+    memset(correct, 0, sizeof(int) * length);
     for (int i = 0; i < length; i++) {
-        printf("_");
+        printf("_ ");
     }
-    scanf("%c", &answer);
-    check(word, answer, length, stage);
+    printf("\n");
+    
+    check(word, &correct, length, stage);
+
+    for (int i = 0; i < length; i++) {
+        if (correct[i] == 1) {
+            printf("%c ", word[i]);
+        }
+        else {
+            printf("_ ");
+        }
+    }
+
+    free(correct);
 }
 
-void game(Word* words, int size) {
+void game(Word* words, int size, int* life) {
     srand(time(NULL));
     int i = rand() % size;
 
@@ -109,8 +130,8 @@ void game(Word* words, int size) {
     char* word = malloc(length + 1);
     strcpy(word, words[i].english);
 
-    stage1(word, length);
-    stage2(word, length);
+    stage1(word, length, &life);
+    //stage2(word, length);
 
     free(word);
 }
@@ -125,7 +146,9 @@ int main() {
         return 1;
     }
 
-    printWords(words, size);
+    game(words, size, &life);
+
+    //printWords(words, size);
 
     freeWords(words, size);
 }
