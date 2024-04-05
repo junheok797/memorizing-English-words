@@ -3,40 +3,39 @@
 #include <string.h>
 #include <time.h>
 
-// ?뻾留④쾶?엫 援ы쁽
-// ?븳湲? 源⑥쭚
-
-typedef struct Word {
+typedef struct Word
+{
     char* english;
     char* korean;
 } Word;
 
-Word* getWord(const char* filename, int* size){
-    // ?뙆?씪 ?뿴湲?
-    FILE *in = fopen("word.txt", "r");
-    if (in == NULL) {
-        printf("?뙆?씪 ?뿴湲? ?떎?뙣: %s\n", filename);
-    }
+Word* getWord(const char* filename, int* size)
+{
+    // 파일 열기
+    FILE* file = fopen(filename, "r");
+    if (file == NULL)
+        printf("파일 열기 실패: %s\n", filename);
 
-    // ?떒?뼱 媛쒖닔 ?꽭湲?
+    // 단어 개수 세기
     *size = 0;
     char line[50];
-    while (fgets(line, sizeof(line), in)) {
+    while (fgets(line, sizeof(line), file))
         (*size)++;
-    }
-    rewind(in);
+    rewind(file);
 
-    // ?룞?쟻 ?븷?떦
+    // 동적 할당
     Word* words = malloc(sizeof(Word) * (*size));
-    if (words == NULL) {
-        printf("?룞?쟻 硫붾え由? ?븷?떦 ?삤瑜?\n");
-        fclose(in);
+    if (words == NULL)
+    {
+        printf("메모리 할당 실패\n");
+        fclose(file);
         exit(1);
     }
 
-    // ?뙆?씪 ?궡?슜 ?씫?뼱?꽌 諛곗뿴?뿉 ????옣
+    // 파일 내용 읽어서 배열에 저장
     int i = 0;
-    while (fgets(line, sizeof(line), in)) {
+    while (fgets(line, sizeof(line), file))
+    {
         char* english = strtok(line, " ");
         char* korean = strtok(NULL, "\n");
 
@@ -49,29 +48,34 @@ Word* getWord(const char* filename, int* size){
         i++;
     }
 
-    fclose(in);
+    fclose(file);
     return words;
 }
 
-void printWords(Word* words, int size) {
-    for (int i = 0; i < size; i++) {
+void printWords(Word* words, int size)
+{
+    for (int i = 0; i < size; i++)
         printf("%s: %s\n", words[i].english, words[i].korean);
-    }
 }
 
-void freeWords(Word* words, int size) {
-    for (int i = 0; i < size; i++) {
+void freeWords(Word* words, int size)
+{
+    for (int i = 0; i < size; i++)
+    {
         free(words[i].english);
         free(words[i].korean);
     }
     free(words);
 }
 
-void check(char* word, int* correct, int length, int stage) {
+void check(char* word, int* correct, int length, int stage)
+{
     char* answer = malloc(length);
+
     if (stage == 1) {
-        printf("원하는 알파벳을 입력하세요>> ");
-        scanf("%s", &answer);
+        printf("Enter a letter: ");
+        scanf("%s", answer);
+        printf("\n");
 
         for (int i = 0; i < length; i++) {
             if (word[i] == answer[0]) {
@@ -84,45 +88,39 @@ void check(char* word, int* correct, int length, int stage) {
     }
 }
 
-void stage2(char* word, int* length) {
-    char* answer = malloc(length + 1);
-
-    for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < length; j++) {
-            printf("_");
-        }
-        scanf("%c", &answer);
-        //check(word, answer, length, stage);
+void printWord(char* word, int* correct, int length)
+{
+    for (int i = 0; i < length; i++)
+    {
+        if (correct[i] == 1)
+            printf("%c ", word[i]);
+        else
+            printf("_ ");
     }
+    printf("\n\n");
+}
 
+void stage2(char* word, int* length, int* life)
+{
 
 }
 
-void stage1(char* word, int length, int* life) {
-    int* correct = (int*)malloc(sizeof(int) * length);
+void stage1(char* word, int* correct, int length, int* life)
+{
     int stage = 1;
+    int repetition = 1;
 
-    memset(correct, 0, sizeof(int) * length);
-    for (int i = 0; i < length; i++) {
-        printf("_ ");
-    }
-    printf("\n");
-    
-    check(word, &correct, length, stage);
-
-    for (int i = 0; i < length; i++) {
-        if (correct[i] == 1) {
-            printf("%c ", word[i]);
-        }
-        else {
-            printf("_ ");
-        }
+    while (repetition <= 3) {
+        printWord(word, correct, length);
+        check(word, correct, length, stage);
+        repetition++;
     }
 
     free(correct);
 }
 
-void game(Word* words, int size, int* life) {
+void game(Word* words, int size, int* life)
+{
     srand(time(NULL));
     int i = rand() % size;
 
@@ -130,16 +128,24 @@ void game(Word* words, int size, int* life) {
     char* word = malloc(length + 1);
     strcpy(word, words[i].english);
 
-    stage1(word, length, &life);
-    //stage2(word, length);
+    int* correct = (int*)malloc(sizeof(int) * length);
+    memset(correct, 0, sizeof(int) * length);
+
+    printf("Welcom to Hangman!\n\n");
+
+    stage1(word, correct, length, &life);
+    //stage2(word, &length, &life);
 
     free(word);
 }
 
-int main() {
+int main()
+{
     int life;
     int size;
-    const char* filename = "word.txt";
+    const char* filename = "words.txt";
+
+    printf("%s", filename);
 
     Word* words = getWord(filename, &size);
     if (words == NULL) {
