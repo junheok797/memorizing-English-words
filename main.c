@@ -145,8 +145,6 @@ int main()
     int size;
     const char* filename = "words.txt";
 
-    printf("%s", filename);
-
     Word* words = getWord(filename, &size);
     if (words == NULL) {
         return 1;
